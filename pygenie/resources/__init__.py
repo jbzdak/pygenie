@@ -1,0 +1,32 @@
+
+import pathlib
+
+RES_DIR = pathlib.Path(__file__).parent
+
+_SAD_REPLACEMENTS = [
+    ['HMEM', "void*"],
+    ['BOOL', 'int'],
+    ['HWND', "void*"]
+]
+
+def get_includes():
+    with RES_DIR.joinpath('cffi_includes.c').open() as f:
+        return f.read()
+
+def get_cdef():
+    """
+    This will be passed to cffi.cdef, this is copy-pasted from Genie
+    header files --- so I'll unwap ankward defines and typedefs
+    so cffi understands datatypes.
+    :return:
+    """
+    with RES_DIR.joinpath('cffi_cdef.c').open() as f:
+        RAW = f.read()
+
+    assert isinstance(RAW, str)
+    for (src, dst) in _SAD_REPLACEMENTS:
+        RAW = RAW.replace(src, dst)
+
+    return RAW
+
+print(get_cdef())
