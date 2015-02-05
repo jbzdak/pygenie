@@ -29,4 +29,9 @@ def get_cdef():
 
     return RAW
 
+def get_system_libs():
+    with RES_DIR.joinpath('system_libs.txt').open() as f:
+        RAW = f.read()
+    return [s.split('.')[0] for s in RAW.strip().split()]
+
 print(get_cdef())
