@@ -1,13 +1,31 @@
 
 import pathlib
+import enum
 
 RES_DIR = pathlib.Path(__file__).parent
 
 _SAD_REPLACEMENTS = [
     ['HMEM', "void*"],
     ['BOOL', 'int'],
-    ['HWND', "void*"]
+    ['HWND', "void*"],
+    ['SADENTRY', 'short']
 ]
+
+class ErrorTypes(enum.IntEnum):
+    Okay = 0
+    Verify = 1
+
+    Error = -1
+    NoDSC = -2
+    WrongState = -3
+
+    @classmethod
+    def is_error(cls, val):
+        return val < 0
+
+
+
+
 
 def get_includes():
     with RES_DIR.joinpath('cffi_includes.c').open() as f:

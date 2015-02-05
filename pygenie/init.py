@@ -6,6 +6,7 @@ from pygenie import resources
 
 S560_PATH = None
 SAD_LIB = None
+ffi = None
 INITIALIZED = False
 
 def _make_initialized():
@@ -13,7 +14,7 @@ def _make_initialized():
         initialize()
 
 def initialize(s560_path="C:\GENIE2K\S560"):
-    global S560_PATH, SAD_LIB, INITIALIZED
+    global S560_PATH, SAD_LIB, INITIALIZED, FFI, ffi
     if INITIALIZED:
         raise ValueError("Already initialized using '{}' path".format(S560_PATH))
 
