@@ -4,15 +4,31 @@ import cffi
 import pathlib
 
 S560_PATH = pathlib.Path("C:\GENIE2K\S560")
+S560_PATH_STR = str(S560_PATH)
 
-S560_LIBS = [str(lib.absolute()) for lib in S560_PATH.iterdir() if lib.suffix.lower() == '.lib']
+S560_LIBS = [str(lib.stem) for lib in S560_PATH.iterdir() if lib.suffix.lower() == '.lib']
+
+SYSTEM_LIBS = [s.split(".")[0] for s in """
+kernel32.lib
+user32.lib
+gdi32.lib
+winspool.lib
+comdlg32.lib
+advapi32.lib
+shell32.lib
+ole32.lib
+oleaut32.lib
+uuid.lib
+odbc32.lib
+odbccp32.lib
+""".strip().split()]
 
 INCLUDE_PATTERN = """
 
 /* Windows includes */
 
 #include <windows.h>
-#include "{S560_PATH}/crackers.h"
+#include <crackers.h>
 
 /* C run time library includes */
 
@@ -22,26 +38,31 @@ INCLUDE_PATTERN = """
 
 /* GENIE-PC User Library includes */
 
-#include "{S560_PATH}/citypes.h"
+#include <citypes.h>
 
-#include "{S560_PATH}/spasst.h"
-#include "{S560_PATH}/sad.h"
-#include "{S560_PATH}/ci_files.h"
-#include "{S560_PATH}/campdef.h"
-#include "{S560_PATH}/cam_n.h"
+#include <spasst.h>
+#include <sad.h>
+#include <ci_files.h>
+#include <campdef.h>
+#include <cam_n.h>
 
 
 /* GENIE-PC Utility Library includes */
 
-#include "{S560_PATH}/utility.h"
+#include <utility.h>
 """
-
-print(S560_LIBS)
-
 from cffi import FFI
 
 ffi = FFI()
 ffi.cdef("""
-    void vG2KEnv( void );
+#include <crackers.h>
+#include <citypes.h>
+void vG2KEnv( void );
+int iUtlCreateFileDSC2( HMEM  * phDSC, BOOL fAdvise, HWND hAdvise );
 """)
-C = ffi.verify(INCLUDE_PATTERN.format(S560_PATH=S560_PATH), libraries=S560_LIBS, include_dirs=[S560_PATH])
+
+C = ffi.verify(INCLUDE_PATTERN.format(S560_PATH=S560_PATH), libraries=S560_LIBS+SYSTEM_LIBS, include_dirs=[S560_PATH_STR], library_dirs=[S560_PATH_STR])
+
+C.vG2KEnv()
+
+print("Done")
