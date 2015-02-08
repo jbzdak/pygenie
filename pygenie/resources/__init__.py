@@ -8,24 +8,12 @@ _SAD_REPLACEMENTS = [
     ['HMEM', "void*"],
     ['BOOL', 'int'],
     ['HWND', "void*"],
-    ['SADENTRY', 'short']
+    ['SADENTRY', 'short'],
+    ['USHORT', 'unsigned short'],
+    ["FLAG", 'unsigned    int'],
+    ['ULONG', 'unsigned    int'],
+    ['UINT', 'unsigned    int']
 ]
-
-class ErrorTypes(enum.IntEnum):
-    Okay = 0
-    Verify = 1
-
-    Error = -1
-    NoDSC = -2
-    WrongState = -3
-
-    @classmethod
-    def is_error(cls, val):
-        return val < 0
-
-
-
-
 
 def get_includes():
     with RES_DIR.joinpath('cffi_includes.c').open() as f:
