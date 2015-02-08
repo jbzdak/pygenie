@@ -10,10 +10,12 @@ _SAD_REPLACEMENTS = [
     ['HWND', "void*"],
     ['SADENTRY', 'short'],
     ['USHORT', 'unsigned short'],
-    ["FLAG", 'unsigned    int'],
-    ['ULONG', 'unsigned    int'],
-    ['UINT', 'unsigned    int']
+    ["FLAG", 'unsigned int'],
+    ['ULONG', 'unsigned int'],
+    ['UINT', 'unsigned int']
 ]
+
+SAD_REPLACEMENTS = dict(_SAD_REPLACEMENTS)
 
 def get_includes():
     with RES_DIR.joinpath('cffi_includes.c').open() as f:

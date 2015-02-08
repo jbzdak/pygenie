@@ -1,5 +1,8 @@
 
+
 import enum
+import re
+import pathlib
 
 class IntAndDescriptionEnum(enum.Enum):
 
@@ -14,3 +17,34 @@ class IntAndDescriptionEnum(enum.Enum):
             if inst.index == index:
                 return inst
         raise KeyError("Couldn't find enum with index of {}".format(index))
+
+# Regexp for single line define (all we need)
+_DEFINE_REGEXP = r"\s*\#define\s+(?P<symbol>[^\s]+)\s+(?P<value>[^\s]+)\s*"
+
+hex_int = lambda x: int(x, 16)
+
+def extract_defines(file_name, prefix=None, value_mapper=int, required_names=tuple()):
+
+    if isinstance(file_name, (str, bytes)):
+        file_name = pathlib.Path(file_name)
+
+    required_names = set(required_names)
+    with file_name.open() as f:
+        result = []
+        for m in re.finditer(_DEFINE_REGEXP, f.read()):
+            symbol = m.group('symbol')
+            if prefix is not None:
+                if not symbol.startswith(prefix):
+                    continue
+                symbol = symbol[len(prefix):]
+            value = value_mapper(m.group('value'))
+            result.append((symbol, value))
+            required_names.discard(symbol)
+
+    if required_names:
+        raise ValueError("Required defines: {} missing from file {}".format(required_names, file_name))
+
+    return result
+
+
+
