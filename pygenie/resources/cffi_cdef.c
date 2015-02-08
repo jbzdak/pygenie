@@ -9,6 +9,9 @@ SADENTRY SadOpenDataSource( HMEM hDSC, char * pszName,
                                  USHORT usType, short fsAccess,
                                  FLAG fVerify, char * pszShellID );
 
-#define VOID 0x1FF
+SADENTRY SadGetSpectrum( HMEM hDSC, USHORT usStart, USHORT usCount,
+                                 FLAG fFloat, void * pvData );
+
+//#define VOID 0x1FF
 //typedef char                CHAR;           /*  8 bit signed int            */
 
