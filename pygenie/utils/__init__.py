@@ -21,9 +21,17 @@ class IntAndDescriptionEnum(enum.Enum):
 # Regexp for single line define (all we need)
 _DEFINE_REGEXP = r"\s*\#define\s+(?P<symbol>[^\s]+)\s+(?P<value>[^\s]+)\s*"
 
-hex_int = lambda x: int(x, 16)
+def strip_l(x):
+    x=x.strip()
+    if x.lower().endswith('l'):
+        x=x[:-1]
+    return x
 
-def extract_defines(file_name, prefix=None, value_mapper=int, required_names=tuple()):
+hex_int = lambda x: int(strip_l(x), 16)
+
+strip_int = lambda x: int(strip_l(x))
+
+def extract_defines(file_name, prefix=None, value_mapper=strip_int, required_names=tuple()):
 
     if isinstance(file_name, (str, bytes)):
         file_name = pathlib.Path(file_name)

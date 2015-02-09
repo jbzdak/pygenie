@@ -12,6 +12,12 @@ SADENTRY SadOpenDataSource( HMEM hDSC, char * pszName,
 SADENTRY SadGetSpectrum( HMEM hDSC, USHORT usStart, USHORT usCount,
                                  FLAG fFloat, void * pvData );
 
+SADENTRY SadGetParam( HMEM hDSC, ULONG ulParam,
+                              USHORT usRecord,   USHORT usEntry,
+                              void * pvData, USHORT usExpect );
+
+SADENTRY SadPutParam( HMEM, ULONG, USHORT, USHORT, void *, USHORT );
+
 //#define VOID 0x1FF
 //typedef char                CHAR;           /*  8 bit signed int            */
 
