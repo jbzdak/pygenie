@@ -15,8 +15,11 @@ open_source(conn,  "C:\\GENIE2K\\CAMFILES\\NBSSTD.CNF", SourceType.NativeSpect, 
 print(params.get_parameter(conn, params.ParamAlias.NUMBER_OF_CHANNELS))
 print(params.get_parameter(conn, params.ParamAlias.TIME_LIVE))
 print(params.get_parameter(conn, params.ParamAlias.TIME_REAL))
-print(params.get_parameter(conn, params.ParamAlias.ENERGY_CALIBRATION_TYPE))
-print(params.get_parameter(conn, params.PARAM_GENERATOR.T_CTITLE))
+print(params.get_parameter(conn, params.EnergyCalibration.TYPE))
+print(params.get_parameter(conn, params.PARAM_GENERATOR.T_STITLE))
+print(params.get_parameter(conn, params.PARAM_GENERATOR.L_ECALTERMS))
+print(params.get_parameter(conn, params.EnergyCalibration.POLYNOMIAL_N0))
+print(params.get_parameter(conn, params.EnergyCalibration.POLYNOMIAL_N1))
 
 print("id {:x}".format(params.PARAM_GENERATOR.T_CTITLE.id))
 
