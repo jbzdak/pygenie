@@ -11,7 +11,9 @@ from pygenie.lib import spectrum
 
 conn = create_vdm_connection()
 # NativeSpect
-open_source(conn,  "C:\\GENIE2K\\CAMFILES\\NBSSTD.CNF", SourceType.NativeSpect, OpenFlags.ReadOnly)
+# open_source(conn,  "C:\\GENIE2K\\CAMFILES\\NBSSTD.CNF", SourceType.NativeSpect, OpenFlags.ReadOnly)
+
+open_source(conn,  "C:\\GENIE2K\\CAMFILES\\Cernipf.CNF", SourceType.NativeSpect, OpenFlags.ReadOnly)
 
 print(params.get_parameter(conn, params.ParamAlias.NUMBER_OF_CHANNELS))
 print(params.get_parameter(conn, params.ParamAlias.TIME_LIVE))
@@ -24,7 +26,12 @@ print(params.get_parameter(conn, params.EnergyCalibration.POLYNOMIAL_N1))
 
 print("id {:x}".format(params.PARAM_GENERATOR.T_CTITLE.id))
 
-print(spectrum._get_spectrum_simple(conn, 0, 100))
+print(spectrum.get_spectrum(conn, 0, 4096))
+print(len(spectrum.get_spectrum(conn, 0, 4096)))
+
+# print(spectrum._get_spectrum_simple(conn, 0, 200))
+
+# print(len(spectrum._get_spectrum_simple(conn, 0, 200)))
 
 # data = init.ffi.new("char[]", 17)
 # init.SAD_LIB.SadGetParam(conn,
