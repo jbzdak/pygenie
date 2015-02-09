@@ -7,6 +7,7 @@ initialize() # Neccessary only if you want to overide path to S560 library
 
 from pygenie.lib import create_vdm_connection, delete_vdm_connection, open_source, OpenFlags, SourceType
 from pygenie.lib import params
+from pygenie.lib import spectrum
 
 conn = create_vdm_connection()
 # NativeSpect
@@ -22,6 +23,8 @@ print(params.get_parameter(conn, params.EnergyCalibration.POLYNOMIAL_N0))
 print(params.get_parameter(conn, params.EnergyCalibration.POLYNOMIAL_N1))
 
 print("id {:x}".format(params.PARAM_GENERATOR.T_CTITLE.id))
+
+print(spectrum._get_spectrum_simple(conn, 0, 100))
 
 # data = init.ffi.new("char[]", 17)
 # init.SAD_LIB.SadGetParam(conn,

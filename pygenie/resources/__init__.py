@@ -12,10 +12,13 @@ _SAD_REPLACEMENTS = [
     ['USHORT', 'unsigned short'],
     ["FLAG", 'unsigned int'],
     ['ULONG', 'unsigned int'],
-    ['UINT', 'unsigned int']
+    ['UINT', 'unsigned int'],
+    ['REAL', 'float']
 ]
 
 SAD_REPLACEMENTS = dict(_SAD_REPLACEMENTS)
+
+MAX_NUMBER_OF_SPECTRUM_CHANNELS_IN_CALL = 4000
 
 def get_includes():
     with RES_DIR.joinpath('cffi_includes.c').open() as f:
