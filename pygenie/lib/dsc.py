@@ -51,4 +51,7 @@ def create_vdm_connection():
 
     return dsc
 
+def flush(dsc):
+    init.SAD_LIB.SadFlush(dsc)
+
 # def get_spectral_data(dsc, channel)

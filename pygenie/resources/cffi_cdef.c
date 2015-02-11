@@ -18,13 +18,4 @@ SADENTRY SadGetParam( HMEM hDSC, ULONG ulParam,
 
 SADENTRY SadPutParam( HMEM, ULONG, USHORT, USHORT, void *, USHORT );
 
-//#define VOID 0x1FF
-//typedef char                CHAR;           /*  8 bit signed int            */
-
-struct char_param{
-    short error;
-    char* param_value;
-} ;
-
-struct char_param NotSoSadGetCharParam(HMEM hDSC, ULONG ulParam,
-                              USHORT usRecord,   USHORT usEntry, USHORT usExpect);
+SADENTRY SadFlush( HMEM hDSC );

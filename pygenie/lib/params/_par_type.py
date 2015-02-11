@@ -1,5 +1,7 @@
+from _operator import itemgetter
 import collections
 import enum
+import re
 
 from pygenie import init; init._make_initialized()
 
@@ -70,23 +72,27 @@ class FFITextParameter(ParamType):
 
     def __init__(self, text_len):
         super().__init__()
-        self.text_len = text_len
-        self.default = b' '*self.text_len
+        self.text_len = text_len-1
+        self.string_len = text_len
+        self.default = b'-'*self.text_len
 
     def from_python(self, obj=None):
 
         if obj is None:
             obj = self.default
 
-        obj = b' ' * (self.text_len - len(obj)) + obj
+        if len(obj) > self.text_len:
+            raise ValueError("Value of parmeter is longer than field length")
 
-        value = init.ffi.new('char[]', self.text_len)
+        obj = obj + b'\0' * (self.string_len - len(obj))
 
-        value[0:self.text_len] = obj
+        value = init.ffi.new('char[]', self.string_len)
+
+        value[0:self.string_len] = obj
         return value
 
     def get_field_size_in_bytes(self):
-        return self.text_len
+        return self.string_len
 
     def to_python(self, pointer):
         return init.ffi.string(pointer)
@@ -110,15 +116,58 @@ PARAM_TYPE_MAPPER.update({
 
 Parameter = collections.namedtuple('Parameter', ['name', 'id', 'type'])
 
+def _parameter_type_for_name( param_name):
+    return PARAM_TYPE_MAPPER[param_name[0].upper()](param_name)
+
+class SerialParam(object):
+
+    @classmethod
+    def _create_from_matches(cls, matches):
+        def par_from_match(match):
+            return Parameter(
+                match[0], match[1], _parameter_type_for_name(match[0])
+            )
+        return SerialParam(
+            par_from_match(matches[0]),
+            {m[2]:par_from_match(m) for m in matches}
+        )
+
+    def __init__(self, first_param, param_map):
+        self.name, self.id, self.type = first_param
+        self.param_map = param_map
+
+    def __getitem__(self, item):
+        return self.param_map[item]
+
+
+
 class ParamGenerator(object):
 
-    def __getattr__(self, item):
-        if item in self.__dict__:
-            return self.__dict__[item]
-        param_id = par_map[item]
-        par_type = PARAM_TYPE_MAPPER[item[0].upper()](item)
-        return Parameter(item, param_id, par_type)
+    def __init__(self):
+        super().__init__()
+        self.__serial_params_cache = {}
 
+    def __getattr__(self, item):
+        try:
+            param_id = par_map[item]
+        except KeyError:
+            raise AttributeError(item)
+        par_type = _parameter_type_for_name(item)
+        p = Parameter(item, param_id, par_type)
+        setattr(self, item, p)
+        return p
+
+    def get_serial_parametr(self, item_pattern):
+        if item_pattern in self.__serial_params_cache:
+            return self.__serial_params_cache[item_pattern]
+        search_format = re.compile(item_pattern.format(r"(?P<param_idx>\d+)"))
+        matches = []
+        for name, value in par_map.items():
+            m = re.match(search_format, name)
+            if m:
+                matches.append((name, value, int(m.group('param_idx'))))
+        matches = sorted(matches, key=itemgetter(2))
+        return SerialParam._create_from_matches(matches)
 
 PARAM_GENERATOR = ParamGenerator()
 
@@ -127,3 +176,6 @@ class ParamAliasBase(enum.Enum):
     @property
     def param(self):
         return getattr(PARAM_GENERATOR, self.value)
+
+    def __getitem__(self, item):
+        return self.value[item]

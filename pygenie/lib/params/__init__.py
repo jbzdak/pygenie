@@ -10,8 +10,20 @@ class ParamAlias(ParamAliasBase):
     TIME_LIVE = "X_ELIVE"
     TIME_REAL = "X_EREAL"
 
-    SAMPLE_TITLE = "T_STITLE"
-    SAMPLE_ID = "T_SIDENT"
+
+class SampleDescription(ParamAliasBase):
+
+    TITLE = "T_STITLE"
+    ID = "T_SIDENT"
+
+    DESCRIPTION = PARAM_GENERATOR.get_serial_parametr("T_SDESC{}")
+
+    DESCRIPTION_1 = "T_SDESC1"
+    DESCRIPTION_2 = "T_SDESC2"
+    DESCRIPTION_3 = "T_SDESC3"
+    DESCRIPTION_4 = "T_SDESC4"
+
+    USER_DEFINED_LONG_STRING = ""
 
 class EnergyCalibration(ParamAliasBase):
 
