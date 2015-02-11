@@ -4,7 +4,7 @@ import pathlib
 import configparser
 import collections
 import struct
-from pygenie import init;
+from pygenie import init
 from pygenie.lib.errors import check_for_error
 
 init._make_initialized()
@@ -12,8 +12,6 @@ init._make_initialized()
 from pygenie.resources import SAD_REPLACEMENTS
 
 from pygenie.utils import IntAndDescriptionEnum, extract_defines, hex_int, strip_int
-from pygenie.utils.bitreader import BitReader
-
 
 pars = extract_defines(
     init.S560_PATH / 'CAMPDEF.H', prefix="CAM_",

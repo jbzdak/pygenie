@@ -6,7 +6,6 @@ from pygenie import init; init._make_initialized()
 from pygenie.resources import SAD_REPLACEMENTS
 
 from pygenie.utils import IntAndDescriptionEnum, extract_defines
-from pygenie.utils.bitreader import BitReader
 
 import enum
 

@@ -1,5 +1,7 @@
 from uuid import uuid4
-from pygenie import init
+
+import numpy as np
+
 from pygenie.init import initialize; initialize() # Neccessary only if you want to overide path to S560 library
 
 from pygenie.lib import create_vdm_connection, delete_vdm_connection, open_source, OpenFlags, SourceType, flush
@@ -7,10 +9,15 @@ from pygenie.lib import params
 from pygenie.lib import spectrum
 
 conn = create_vdm_connection()
-# NativeSpect
-# open_source(conn,  "C:\\GENIE2K\\CAMFILES\\NBSSTD.CNF", SourceType.NativeSpect, OpenFlags.ReadOnly)
 
 open_source(conn,  "C:\\GENIE2K\\CAMFILES\\NAI2.CNF", SourceType.NativeSpect, OpenFlags.ReadOnly|OpenFlags.ReadWrite)
+
+# Parameter reading is easy, but there are many ways to obtain parameter object
+# All defined parameters are avilable from PARAM_GENERATOR object
+# Parameters that were used by me got saner names avilable from:
+# * ParamAlias (misc parameters)
+# * EnergyCalibration (params related to energy calibration)
+# * SampleDescription (related to sample description)
 
 print(params.get_parameter(conn, params.ParamAlias.NUMBER_OF_CHANNELS))
 print(params.get_parameter(conn, params.ParamAlias.TIME_LIVE))
@@ -18,17 +25,27 @@ print(params.get_parameter(conn, params.ParamAlias.TIME_REAL))
 print(params.get_parameter(conn, params.EnergyCalibration.TYPE))
 print(params.get_parameter(conn, params.PARAM_GENERATOR.T_STITLE))
 print(params.get_parameter(conn, params.PARAM_GENERATOR.L_ECALTERMS))
-print(params.get_parameter(conn, params.EnergyCalibration.POLYNOMIAL_N0))
-print(params.get_parameter(conn, params.EnergyCalibration.POLYNOMIAL_N1))
 print(params.get_parameter(conn, params.SampleDescription.DESCRIPTION[4]))
+
+
+# This gets calibration as numpy polynomial
+print(params.get_calibration(conn))
 
 print("id {:x}".format(params.PARAM_GENERATOR.T_CTITLE.id))
 
+poly = params.get_calibration(conn)
+
+# This calculates energy for each channel
+print(np.polyval(poly, np.arange(1, 1024)))
+
+# Prints spectrum:
 print(spectrum.get_spectrum(conn, 0, 1024))
 print(len(spectrum.get_spectrum(conn, 0, 1024)))
 
+# Sets parameter:
 params.set_parameter(conn, params.SampleDescription.DESCRIPTION[4], str(uuid4()).encode("ascii"))
 
+# Remember to flush it
 flush(conn)
 
 # TODO: Call to flush needed?

@@ -1,4 +1,6 @@
 import enum
+
+import numpy as np
 from pygenie import init; init._make_initialized()
 from pygenie.lib import check_for_error
 from pygenie.lib.params._par_type import PARAM_GENERATOR, Parameter, ParamAliasBase
@@ -18,17 +20,12 @@ class SampleDescription(ParamAliasBase):
 
     DESCRIPTION = PARAM_GENERATOR.get_serial_parametr("T_SDESC{}")
 
-    DESCRIPTION_1 = "T_SDESC1"
-    DESCRIPTION_2 = "T_SDESC2"
-    DESCRIPTION_3 = "T_SDESC3"
-    DESCRIPTION_4 = "T_SDESC4"
-
-    USER_DEFINED_LONG_STRING = ""
-
 class EnergyCalibration(ParamAliasBase):
 
     TYPE = "T_ECALTYPE"
     UNIT = "T_ECALUNITS"
+
+    TERMS = "L_ECALTERMS"
 
     # Next we assume that calibration has form:
     # \Sum_{i=0..N} n_i * x^0
@@ -39,6 +36,14 @@ class EnergyCalibration(ParamAliasBase):
     POLYNOMIAL_N4 = "F_ECALFAC2"
     POLYNOMIAL_N5 = "F_ECALFAC3"
 
+    POLY_COEFFS = PARAM_GENERATOR.get_composite_parameter(
+        ['F_ECOFFSET', 'F_ECSLOPE', 'F_ECQUAD', 'F_ECALFAC1',
+         'F_ECALFAC2', 'F_ECALFAC3'])
+
+_CALIBRATION_PARAMS = [
+    EnergyCalibration.POLYNOMIAL_N0,
+
+]
 
 
 def get_parameter(dsc, parameter, record=1, entry=1):
@@ -68,4 +73,18 @@ def set_parameter(dsc, parameter, value,  record=1, entry=1):
         dsc, parameter.id, record, entry,
         pvalue,
         parameter.type.get_field_size_in_bytes()))
+
+def get_calibration(dsc):
+    calibration_type  = get_parameter(dsc, EnergyCalibration.TYPE)
+    if calibration_type != b"POLY":
+        raise ValueError(
+            "We can only interpret polynomial calibration. Calibration type used was {}".format(calibration_type))
+
+    degree = get_parameter(dsc, EnergyCalibration.TERMS)
+    params = [
+        get_parameter(dsc, par) for ii, par in zip(range(degree), EnergyCalibration.POLY_COEFFS)
+    ]
+
+    calibration_poly = np.asarray(list(reversed(params)))
+    return calibration_poly
 

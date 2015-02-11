@@ -139,7 +139,11 @@ class SerialParam(object):
     def __getitem__(self, item):
         return self.param_map[item]
 
+    def __len__(self):
+        return len(self.param_map)
 
+    def __iter__(self):
+        return iter((self.param_map[ii] for ii in sorted(self.param_map.keys())))
 
 class ParamGenerator(object):
 
@@ -169,6 +173,11 @@ class ParamGenerator(object):
         matches = sorted(matches, key=itemgetter(2))
         return SerialParam._create_from_matches(matches)
 
+    def get_composite_parameter(self, param_names):
+        return SerialParam._create_from_matches(
+            [(param, par_map[param], ii) for ii, param in enumerate(param_names) ]
+        )
+
 PARAM_GENERATOR = ParamGenerator()
 
 class ParamAliasBase(enum.Enum):
@@ -179,3 +188,9 @@ class ParamAliasBase(enum.Enum):
 
     def __getitem__(self, item):
         return self.value[item]
+
+    def __len__(self):
+        return len(self.value)
+
+    def __iter__(self):
+        return iter(self.value)
