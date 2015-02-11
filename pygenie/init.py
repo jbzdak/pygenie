@@ -1,5 +1,3 @@
-import numpy as np
-from cffi import FFI
 import pathlib
 
 from pygenie import resources
@@ -14,7 +12,8 @@ def _make_initialized():
         initialize()
 
 def initialize(s560_path="C:\GENIE2K\S560"):
-    global S560_PATH, SAD_LIB, INITIALIZED, FFI, ffi
+    from cffi import FFI
+    global S560_PATH, SAD_LIB, INITIALIZED, ffi
     if INITIALIZED:
         raise ValueError("Already initialized using '{}' path".format(S560_PATH))
 

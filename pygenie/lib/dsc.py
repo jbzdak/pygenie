@@ -1,10 +1,11 @@
-
 import pathlib
-import collections
-from pygenie import init; init._make_initialized()
+
+from pygenie import init;
+
+init._make_initialized()
 from pygenie.utils import extract_defines, hex_int
 
-from pygenie.lib.errors import check_for_error, GenieException, is_sad_call_successful, ReturnErrorCodes
+from pygenie.lib.errors import check_for_error, ReturnErrorCodes
 
 import enum
 

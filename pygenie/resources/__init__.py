@@ -1,6 +1,5 @@
 
 import pathlib
-import enum
 
 RES_DIR = pathlib.Path(__file__).parent
 

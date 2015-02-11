@@ -1,7 +1,10 @@
 import pathlib
 import configparser
 import collections
-from pygenie import init; init._make_initialized()
+
+from pygenie import init;
+
+init._make_initialized()
 
 from pygenie.resources import SAD_REPLACEMENTS
 

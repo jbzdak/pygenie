@@ -1,7 +1,8 @@
-import enum
-
 import numpy as np
-from pygenie import init; init._make_initialized()
+
+from pygenie import init;
+
+init._make_initialized()
 from pygenie.lib import check_for_error
 from pygenie.lib.params._par_type import PARAM_GENERATOR, Parameter, ParamAliasBase
 

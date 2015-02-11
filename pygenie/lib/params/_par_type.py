@@ -3,9 +3,11 @@ import collections
 import enum
 import re
 
-from pygenie import init; init._make_initialized()
+from pygenie import init;
 
-from pygenie.lib.params._data import par_map, pars, text_lengths
+init._make_initialized()
+
+from pygenie.lib.params._data import par_map, text_lengths
 
 class ParamType(object):
 
