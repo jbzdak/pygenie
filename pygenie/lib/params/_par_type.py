@@ -76,32 +76,6 @@ class TimeDeltaParam(FFIParamType):
         super().__init__('double', 0.0, 8)
 
 
-class DateTimeParam(ParamType):
-
-    def __init__(self):
-        super().__init__()
-        self.ffi_type = TimeDeltaParam()
-
-    def from_python(self, obj=None):
-        if obj is not None:
-            raise ValueError("Setting datetime parameters is not supported (yet)")
-        return self.ffi_type.from_python()
-
-    def get_field_size_in_bytes(self):
-        return self.ffi_type.get_field_size_in_bytes()
-
-    def to_python(self, pointer):
-        double = self.ffi_type.to_python(pointer)
-        return convert_interval_to_absolute_date(double)
-
-def convert_interval_to_absolute_date(interval):
-    tm = init.ffi.new("struct tm[1]")
-    result = init.SAD_LIB.fUtlCAMToCTime(interval, tm)
-    if result != 0:
-        raise GenieDatetimeConversionError("Error converting float {} to tm structure".format(interval))
-    return tm
-
-
 class FFITextParameter(ParamType):
 
     def __init__(self, text_len):
@@ -131,8 +105,6 @@ class FFITextParameter(ParamType):
     def to_python(self, pointer):
         return init.ffi.string(pointer)
 
-
-
 def create_char_parameter_type(name):
     length = text_lengths[name[2:]]
     if length is None:
@@ -140,16 +112,11 @@ def create_char_parameter_type(name):
     else:
         return FFITextParameter(length)
 
-def select_time_parameter(name):
-    if name in absolute_time_params:
-        return DateTimeParam()
-    return TimeDeltaParam()
-
 PARAM_TYPE_MAPPER = collections.defaultdict(lambda: lambda x: ParamType())
 
 PARAM_TYPE_MAPPER.update({
     "L": lambda x: FFIParamType('LONG', 0, 4),
-    "X": select_time_parameter,
+    "X": lambda x: TimeDeltaParam(),
     "F": lambda x: FFIParamType('float', 0.0, 4),
     "T": create_char_parameter_type})
 

@@ -35,5 +35,3 @@ struct tm {
 };
 
 long long NotSadMkTime(struct tm *timeptr);
-
-char *  asctime(const struct tm * _Tm);
