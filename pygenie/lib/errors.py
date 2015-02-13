@@ -58,6 +58,9 @@ class GenieError(GenieException):
 class GenieSadGetStatusError(GenieException):
     pass
 
+class GenieDatetimeConversionError(GenieException):
+    pass
+
 def is_sad_call_successful(result_value):
     return result_value == ReturnErrorCodes.Okay
 

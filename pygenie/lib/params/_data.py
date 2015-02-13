@@ -14,4 +14,9 @@ text_lengths = dict(extract_defines(
     required_names=[],
     value_mapper=strip_int))
 
+absolute_time_params = set()
+# {
+#     "X_ASTIME"
+# }
+
 par_map = dict(pars)

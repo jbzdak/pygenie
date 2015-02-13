@@ -8,6 +8,8 @@ from pygenie.lib import create_vdm_connection, delete_vdm_connection, open_sourc
 from pygenie.lib import params
 from pygenie.lib import spectrum
 
+import datetime
+
 conn = create_vdm_connection()
 
 open_source(conn,  "C:\\GENIE2K\\CAMFILES\\NAI2.CNF", SourceType.NativeSpect, OpenFlags.ReadOnly|OpenFlags.ReadWrite)
@@ -27,9 +29,18 @@ print(params.get_parameter(conn, params.PARAM_GENERATOR.T_STITLE))
 print(params.get_parameter(conn, params.PARAM_GENERATOR.L_ECALTERMS))
 print(params.get_parameter(conn, params.SampleDescription.DESCRIPTION[4]))
 
+print(params.get_parameter(conn, params.SampleDescription.MEASURE_START_TIME))
 
 # This gets calibration as numpy polynomial
-print(params.get_calibration(conn))
+
+# 10-09- 2014
+# print("DATETIME " + datetime.datetime(1970, 1, 1,) + datetime.timedelta(seconds=params.get_calibration(conn)))
+
+tm = params.get_parameter(conn, params.SampleDescription.MEASURE_START_TIME)
+
+print(tm.tm_year)
+print(tm.tm_mon)
+print(tm.tm_mday)
 
 print("id {:x}".format(params.PARAM_GENERATOR.T_CTITLE.id))
 
@@ -47,8 +58,6 @@ params.set_parameter(conn, params.SampleDescription.DESCRIPTION[4], str(uuid4())
 
 # Remember to flush it
 flush(conn)
-
-# TODO: Call to flush needed?
 
 delete_vdm_connection(conn)
 

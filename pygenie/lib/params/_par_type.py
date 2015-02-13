@@ -4,10 +4,12 @@ import enum
 import re
 
 from pygenie import init;
+from pygenie.init import SAD_LIB
+from pygenie.lib.errors import GenieDatetimeConversionError
 
 init._make_initialized()
 
-from pygenie.lib.params._data import par_map, text_lengths
+from pygenie.lib.params._data import par_map, text_lengths, absolute_time_params
 
 class ParamType(object):
 
@@ -69,6 +71,36 @@ class FFIParamType(ParamType):
     def to_python(self, pointer):
         return pointer[0]
 
+class TimeDeltaParam(FFIParamType):
+    def __init__(self):
+        super().__init__('double', 0.0, 8)
+
+
+class DateTimeParam(ParamType):
+
+    def __init__(self):
+        super().__init__()
+        self.ffi_type = TimeDeltaParam()
+
+    def from_python(self, obj=None):
+        if obj is not None:
+            raise ValueError("Setting datetime parameters is not supported (yet)")
+        return self.ffi_type.from_python()
+
+    def get_field_size_in_bytes(self):
+        return self.ffi_type.get_field_size_in_bytes()
+
+    def to_python(self, pointer):
+        double = self.ffi_type.to_python(pointer)
+        return convert_interval_to_absolute_date(double)
+
+def convert_interval_to_absolute_date(interval):
+    tm = init.ffi.new("struct tm[1]")
+    result = init.SAD_LIB.fUtlCAMToCTime(interval, tm)
+    if result != 0:
+        raise GenieDatetimeConversionError("Error converting float {} to tm structure".format(interval))
+    return tm
+
 
 class FFITextParameter(ParamType):
 
@@ -108,11 +140,16 @@ def create_char_parameter_type(name):
     else:
         return FFITextParameter(length)
 
+def select_time_parameter(name):
+    if name in absolute_time_params:
+        return DateTimeParam()
+    return TimeDeltaParam()
+
 PARAM_TYPE_MAPPER = collections.defaultdict(lambda: lambda x: ParamType())
 
 PARAM_TYPE_MAPPER.update({
     "L": lambda x: FFIParamType('LONG', 0, 4),
-    "X": lambda x: FFIParamType('double', 0.0, 8),
+    "X": select_time_parameter,
     "F": lambda x: FFIParamType('float', 0.0, 4),
     "T": create_char_parameter_type})
 
@@ -153,6 +190,9 @@ class ParamGenerator(object):
         super().__init__()
         self.__serial_params_cache = {}
 
+    def param_set(self):
+        return par_map.keys()
+
     def __getattr__(self, item):
         try:
             param_id = par_map[item]
@@ -162,6 +202,9 @@ class ParamGenerator(object):
         p = Parameter(item, param_id, par_type)
         setattr(self, item, p)
         return p
+
+    def __getitem__(self, item):
+        return self.__getattr__(item)
 
     def get_serial_parametr(self, item_pattern):
         if item_pattern in self.__serial_params_cache:

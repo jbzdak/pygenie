@@ -14,3 +14,9 @@
 #include <string.h>
 
 #include <stdlib.h>
+
+#include <time.h>
+
+long long NotSadMkTime(struct tm *timeptr){
+    return mktime(timeptr);
+}

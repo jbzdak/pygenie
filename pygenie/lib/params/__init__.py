@@ -21,6 +21,9 @@ class SampleDescription(ParamAliasBase):
 
     DESCRIPTION = PARAM_GENERATOR.get_serial_parametr("T_SDESC{}")
 
+    MEASURE_START_TIME = "X_ASTIME"
+
+
 class EnergyCalibration(ParamAliasBase):
 
     TYPE = "T_ECALTYPE"
@@ -40,11 +43,6 @@ class EnergyCalibration(ParamAliasBase):
     POLY_COEFFS = PARAM_GENERATOR.get_composite_parameter(
         ['F_ECOFFSET', 'F_ECSLOPE', 'F_ECQUAD', 'F_ECALFAC1',
          'F_ECALFAC2', 'F_ECALFAC3'])
-
-_CALIBRATION_PARAMS = [
-    EnergyCalibration.POLYNOMIAL_N0,
-
-]
 
 
 def get_parameter(dsc, parameter, record=1, entry=1):
