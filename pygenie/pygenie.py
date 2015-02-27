@@ -5,9 +5,25 @@ from contextlib import contextmanager
 from pygenie.lib import *
 from pygenie.lib.params._par_type import Parameter
 
-MeasurementTime = namedtuple('MeasurementTime', ['live', 'real'])
+class MeasurementTime(object):
 
-class EnergyCalibration(object):
+    def __init__(self, live, real):
+        self.live = live
+        self.real = real
+
+    def serialize(self):
+        return {
+            "live": self.live,
+            "real": self.real
+        }
+
+class EnergycalibrationManager(object):
+
+    POLYNOMIAL_CALIBRATION = b"POLY"
+    """
+    Value of ``EnergyCalibration.TYPE`` parameter which signifies
+    polynomial calibration (that we are able to serialize.
+    """
 
     def __init__(self, pygenie):
         super().__init__()
@@ -35,6 +51,17 @@ class EnergyCalibration(object):
         call.
         """
         return get_calibration(self.pygenie.dsc)
+
+    def serialize(self):
+        serialized_dict = {
+            "type" : self.type,
+            "unit": self.unit,
+        }
+        if serialized_dict['type'] == self.POLYNOMIAL_CALIBRATION:
+            serialized_dict.update({
+                "energy_calibration": list(self.get_calibration_coefficients())
+            })
+        return serialized_dict
 
 @contextmanager
 def open_cam_source(file_name, source_type, open_mode=OpenFlags.ReadOnly, verify_hardware=False, shell_ptr=b""):
@@ -219,7 +246,7 @@ class PYGenieObj(object):
 
     @property
     def energy_calibration(self):
-        return EnergyCalibration(self)
+        return EnergycalibrationManager(self)
 
     def get_description(self, part=0):
         """
@@ -245,6 +272,41 @@ class PYGenieObj(object):
         return self.convert_cam_interval_to_datetime(
             get_parameter(self.dsc, SampleDescription.MEASURE_START_TIME)
         )
+
+    def serialize(self, convert_absolute_datetime_params=False, additional_metadata = None):
+        """
+        Returns a dictionary (that can be immediately serialized to JSON)
+
+        (Format should be self-evident).
+
+        :param bool convert_absolute_datetime_params:  if true --- we will convert absolute datetimes and present them
+                                                       as strings.
+
+        :return: dict
+        """
+
+        additional_metadata = {} if additional_metadata is None else additional_metadata
+        # param_list = [] if param_list is None else param_list
+
+        serialized_dict = {
+            "metadata": additional_metadata,
+            "channel_count": self.channel_count,
+            "measurment_start_time": self.measurement_start_time,
+            "measurement_time" : self.measurement_time,
+            "spectrum": self[:],
+            "sample_id": self.sample_id,
+            "title": self.title,
+            "description": [],
+            "energy_calibration": self.energy_calibration.serialize(),
+            "params": []
+        }
+
+        # for param_list
+
+        for ii in range(4):
+            serialized_dict['description'].append(self.get_description(ii))
+
+        return serialized_dict
 
     def __del__(self):
         self.close()
